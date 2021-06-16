@@ -1,0 +1,8 @@
+
+protocolos/.mxproject
+protocolos/.project
+protocolos/.cproject
+protocolos/STM32F401RETX_FLASH.ld
+protocolos/STM32F401RETX_RAM.ld
+protocolos/.settings/language.settings.xml
+protocolos/.settings/stm32cubeide.project.prefs
