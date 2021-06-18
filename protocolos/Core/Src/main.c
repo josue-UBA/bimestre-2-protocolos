@@ -96,16 +96,25 @@ int main(void)
   MX_USART2_UART_Init();
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
-	//1. Initialise the MPU6050 module and I2C
-	MPU6050_Init(&hi2c1);
-	//2. Configure Accel and Gyro parameters
-	myMpuConfig.Accel_Full_Scale = AFS_SEL_4g;
-	myMpuConfig.ClockSource = Internal_8MHz;
-	myMpuConfig.CONFIG_DLPF = DLPF_184A_188G_Hz;
-	myMpuConfig.Gyro_Full_Scale = FS_SEL_500;
-	myMpuConfig.Sleep_Mode_Bit = 0;  //1: sleep mode, 0: normal mode
-	MPU6050_Config(&myMpuConfig);
-		printf("holaaaa\n\r");
+  //1. Initialise the MPU6050 module and I2C
+  MPU6050_Init(&hi2c1);
+  //2. Configure Accel and Gyro parameters
+  myMpuConfig.Accel_Full_Scale = AFS_SEL_4g;
+  myMpuConfig.ClockSource = Internal_8MHz;
+  myMpuConfig.CONFIG_DLPF = DLPF_184A_188G_Hz;
+  myMpuConfig.Gyro_Full_Scale = FS_SEL_500;
+  myMpuConfig.Sleep_Mode_Bit = 0;  //1: sleep mode, 0: normal mode
+  MPU6050_Config(&myMpuConfig);
+  int a0 = myAccelScaled.x;
+  int a1 = myAccelScaled.y;
+  int a2 = myAccelScaled.z;
+  int aux_x_mayor=-500;
+  int aux_y_mayor=-500;
+  int aux_z_mayor=-500;
+  int aux_x_menor=10000;
+  int aux_y_menor=10000;
+  int aux_z_menor=10000;
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -125,7 +134,19 @@ int main(void)
 
 	  		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
 	  		HAL_Delay(10);
-	  		printf("holaaaa\n\r");
+	  		a0 = myAccelScaled.x;
+	  		a1 = myAccelScaled.y;
+	  		a2 = myAccelScaled.z;
+            if(aux_x_mayor<a0){aux_x_mayor=a0;}
+            if(aux_y_mayor<a1){aux_y_mayor=a1;}
+            if(aux_z_mayor<a2){aux_z_mayor=a2;}
+
+            if(a0<aux_x_menor){aux_x_menor=a0;}
+            if(a1<aux_y_menor){aux_y_menor=a1;}
+            if(a2<aux_z_menor){aux_z_menor=a2;}
+
+            //myGyroScaled.x;
+	  		printf("x: %d \t y: %d \t z: %d \t x: %d \t y: %d \t z: %d \n\r",aux_x_mayor,aux_y_mayor,aux_z_mayor,aux_x_menor,aux_y_menor,aux_z_menor);
 
   }
   /* USER CODE END 3 */

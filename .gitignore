@@ -7,3 +7,4 @@ protocolos/STM32F401RETX_RAM.ld
 protocolos/.settings/language.settings.xml
 protocolos/.settings/stm32cubeide.project.prefs
 protocolos/Debug/
+protocolos/proyecto.launch
