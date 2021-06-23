@@ -61,23 +61,23 @@ void ESP_Init (char *SSID, char *PASSWD)
 	Uart_flush(wifi_uart);
 	Uart_sendstring("AT\r\n", wifi_uart);
 	while(!(Wait_for("OK\r\n", wifi_uart)));
-	Uart_sendstring("AT---->OK\n\n", pc_uart);
+	Uart_sendstring("AT---->OK\n\r", pc_uart);
 
 
 	/********* AT+CWMODE=1 **********/
 	Uart_flush(wifi_uart);
 	Uart_sendstring("AT+CWMODE=1\r\n", wifi_uart);
 	while (!(Wait_for("OK\r\n", wifi_uart)));
-	Uart_sendstring("CW MODE---->1\n\n", pc_uart);
+	Uart_sendstring("CW MODE---->1\n\r", pc_uart);
 
 
 	/********* AT+CWJAP="SSID","PASSWD" **********/
 	Uart_flush(wifi_uart);
-	Uart_sendstring("connecting... to the provided AP\n", pc_uart);
+	Uart_sendstring("connecting... to the provided AP\n\r", pc_uart);
 	sprintf (data, "AT+CWJAP=\"%s\",\"%s\"\r\n", SSID, PASSWD);
 	Uart_sendstring(data, wifi_uart);
 	while (!(Wait_for("OK\r\n", wifi_uart)));
-	sprintf (data, "Connected to,\"%s\"\n\n", SSID);
+	sprintf (data, "Connected to,\"%s\"\n\r", SSID);
 	Uart_sendstring(data,pc_uart);
 
 
@@ -89,22 +89,22 @@ void ESP_Init (char *SSID, char *PASSWD)
 	while (!(Wait_for("OK\r\n", wifi_uart)));
 	int len = strlen (buffer);
 	buffer[len-1] = '\0';
-	sprintf (data, "IP ADDR: %s\n\n", buffer);
+	sprintf (data, "IP ADDR: %s\n\r", buffer);
 	Uart_sendstring(data, pc_uart);
 
 	/********* AT+CIPMUX **********/
 	Uart_flush(wifi_uart);
 	Uart_sendstring("AT+CIPMUX=1\r\n", wifi_uart);
 	while (!(Wait_for("OK\r\n", wifi_uart)));
-	Uart_sendstring("CIPMUX---->OK\n\n", pc_uart);
+	Uart_sendstring("CIPMUX---->OK\n\r", pc_uart);
 
 	/********* AT+CIPSERVER **********/
 	Uart_flush(wifi_uart);
 	Uart_sendstring("AT+CIPSERVER=1,80\r\n", wifi_uart);
 	while (!(Wait_for("OK\r\n", wifi_uart)));
-	Uart_sendstring("CIPSERVER---->OK\n\n", pc_uart);
+	Uart_sendstring("CIPSERVER---->OK\n\r", pc_uart);
 
-	Uart_sendstring("Now Connect to the IP ADRESS\n\n", pc_uart);
+	Uart_sendstring("Now Connect to the IP ADRESS\n\r", pc_uart);
 
 }
 

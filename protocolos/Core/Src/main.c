@@ -92,7 +92,7 @@ int main(void)
   MX_USART2_UART_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
-  ESP_Init("mi" , "11111111");
+  ESP_Init("CASA 3" , "N9T5K8T2b58");
   /* USER CODE END 2 */
 
   /* Infinite loop */
