@@ -181,4 +181,6 @@ void Server_Start (void)
 		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 0);
 		Server_Handle("/ ", Link_ID);
 	}
+	Uart_sendstring(buftocopyinto,pc_uart);
+	Uart_sendstring("\n\n\r",pc_uart);
 }
