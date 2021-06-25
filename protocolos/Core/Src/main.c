@@ -43,7 +43,14 @@
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
+int flag,j,a;
+uint8_t rx;
+char str1[60]={0};
 
+int len;
+char buffer[100];
+
+int i;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -94,8 +101,40 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while (1)
-  {
+	while (1) {
+
+		if (flag == 1) {
+			a = 0;
+			HAL_Delay(50);
+			for (j = 0; j < 60; j++) {
+
+				if ((str1[j] == 'l') && (str1[j + 1] == 'e')
+						&& (str1[j + 2] == 'd') && (str1[j + 3] == 'o')
+						&& (str1[j + 4] == 'n')) {
+					//HAL_Delay(1000);
+					HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, 0);
+					for (j = 0; j < 60; j++) {
+						str1[j] = 0;
+					}
+
+				}
+			}
+
+			for (j = 0; j < 60; j++) {
+
+				if ((str1[j] == 'l') && (str1[j + 1] == 'e')
+						&& (str1[j + 2] == 'd') && (str1[j + 3] == 'o')
+						&& (str1[j + 4] == 'f') && (str1[j + 5] == 'f')) {
+					//HAL_Delay(1000);
+					HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, 1);
+					for (j = 0; j < 60; j++) {
+						str1[j] = 0;
+					}
+
+				}
+			}
+			flag = 0;
+		}
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
