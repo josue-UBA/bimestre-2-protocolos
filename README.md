@@ -1,7 +1,10 @@
 # bimestre-2-protocolos
 
-conexion STM32 F401RE con ESP8266-01:
+## STM32F401RE + ESP8266-01:
 https://www.youtube.com/watch?v=LS7owD8C_tI
 
-LCD + STM32
+## STM32F401RE + LCD 16x2
 https://www.youtube.com/watch?v=ITTBWSQTi3c
+
+## STM32F401RE + bluetooth HC-05  
+https://www.youtube.com/watch?v=1LcbZaTPZ90
