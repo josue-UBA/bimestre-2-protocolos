@@ -13,6 +13,7 @@
 
 extern UART_HandleTypeDef huart1;
 extern UART_HandleTypeDef huart2;
+extern myQueue01Handle;
 
 #define wifi_uart &huart1
 #define pc_uart &huart2
@@ -157,6 +158,7 @@ void Server_Handle (char *str, int Link_ID)
 
 void Server_Start (void)
 {
+	int a;
 	char buftocopyinto[64] = {0};
 	char Link_ID;
 	while (!(Get_after("+IPD,", 1, &Link_ID, wifi_uart)));
@@ -166,12 +168,16 @@ void Server_Start (void)
 	{
 		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 1);
 		Server_Handle("/ledon",Link_ID);
+		a = 1;
+		osMessageQueuePut(myQueue01Handle,&a,0,0);
 	}
 
 	else if (Look_for("/ledoff", buftocopyinto) == 1)
 	{
 		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 0);
 		Server_Handle("/ledoff",Link_ID);
+		a = 0;
+		osMessageQueuePut(myQueue01Handle,&a,0,0);
 	}
 
 	else if (Look_for("/favicon.ico", buftocopyinto) == 1);
@@ -180,6 +186,8 @@ void Server_Start (void)
 	{
 		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 0);
 		Server_Handle("/ ", Link_ID);
+		a = 0;
+		osMessageQueuePut(myQueue01Handle,&a,0,0);
 	}
 	Uart_sendstring(buftocopyinto,pc_uart);
 	Uart_sendstring("\n\n\r",pc_uart);

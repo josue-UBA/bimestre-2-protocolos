@@ -46,19 +46,24 @@ I2C_HandleTypeDef hi2c1;
 UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart2;
 
-/* Definitions for defaultTask */
-osThreadId_t defaultTaskHandle;
-const osThreadAttr_t defaultTask_attributes = {
-  .name = "defaultTask",
-  .stack_size = 128 * 30,
+/* Definitions for tarea_wifi */
+osThreadId_t tarea_wifiHandle;
+const osThreadAttr_t tarea_wifi_attributes = {
+  .name = "tarea_wifi",
+  .stack_size = 960 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
-/* Definitions for myTask02 */
-osThreadId_t myTask02Handle;
-const osThreadAttr_t myTask02_attributes = {
-  .name = "myTask02",
-  .stack_size = 128 * 30,
+/* Definitions for tarea_LCD */
+osThreadId_t tarea_LCDHandle;
+const osThreadAttr_t tarea_LCD_attributes = {
+  .name = "tarea_LCD",
+  .stack_size = 960 * 4,
   .priority = (osPriority_t) osPriorityNormal,
+};
+/* Definitions for myQueue01 */
+osMessageQueueId_t myQueue01Handle;
+const osMessageQueueAttr_t myQueue01_attributes = {
+  .name = "myQueue01"
 };
 /* USER CODE BEGIN PV */
 
@@ -70,8 +75,8 @@ static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_USART1_UART_Init(void);
 static void MX_I2C1_Init(void);
-void StartDefaultTask(void *argument);
-void StartTask02(void *argument);
+void funcion_wifi(void *argument);
+void funcion_LCD(void *argument);
 
 /* USER CODE BEGIN PFP */
 
@@ -131,16 +136,20 @@ int main(void)
   /* start timers, add new ones, ... */
   /* USER CODE END RTOS_TIMERS */
 
+  /* Create the queue(s) */
+  /* creation of myQueue01 */
+  myQueue01Handle = osMessageQueueNew (16, sizeof(int), &myQueue01_attributes);
+
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
-  /* creation of defaultTask */
-  defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
+  /* creation of tarea_wifi */
+  tarea_wifiHandle = osThreadNew(funcion_wifi, NULL, &tarea_wifi_attributes);
 
-  /* creation of myTask02 */
-  myTask02Handle = osThreadNew(StartTask02, NULL, &myTask02_attributes);
+  /* creation of tarea_LCD */
+  tarea_LCDHandle = osThreadNew(funcion_LCD, NULL, &tarea_LCD_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -346,14 +355,14 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE END 4 */
 
-/* USER CODE BEGIN Header_StartDefaultTask */
+/* USER CODE BEGIN Header_funcion_wifi */
 /**
-  * @brief  Function implementing the defaultTask thread.
+  * @brief  Function implementing the tarea_wifi thread.
   * @param  argument: Not used
   * @retval None
   */
-/* USER CODE END Header_StartDefaultTask */
-void StartDefaultTask(void *argument)
+/* USER CODE END Header_funcion_wifi */
+void funcion_wifi(void *argument)
 {
   /* USER CODE BEGIN 5 */
 	  ESP_Init("CASA 3" , "N9T5K8T2b58");
@@ -368,37 +377,46 @@ void StartDefaultTask(void *argument)
   /* USER CODE END 5 */
 }
 
-/* USER CODE BEGIN Header_StartTask02 */
+/* USER CODE BEGIN Header_funcion_LCD */
 /**
-* @brief Function implementing the myTask02 thread.
+* @brief Function implementing the tarea_LCD thread.
 * @param argument: Not used
 * @retval None
 */
-/* USER CODE END Header_StartTask02 */
-void StartTask02(void *argument)
+/* USER CODE END Header_funcion_LCD */
+void funcion_LCD(void *argument)
 {
-  /* USER CODE BEGIN StartTask02 */
+  /* USER CODE BEGIN funcion_LCD */
 	  lcd_init ();
 	  lcd_put_cur(0x0,0x0);
 	  lcd_send_string ("Texto de prueba:");  // send string to the lcd
 	  osDelay(2000);
-	  int i=0;
-
+	  int a=0;
   /* Infinite loop */
   for(;;)
   {
-	  //taskENTER_CRITICAL();
-		for(i=20;i<128;i++)
-		{
-	      lcd_put_cur(0x1,0x0);
-		  lcd_send_data(i);  // send string to the lcd
-		  osDelay(200);
-	    }
-	    i=0;
-//taskEXIT_CRITICAL();
-    osDelay(1);
+
+	  osMessageQueueGet(myQueue01Handle,&a,0,0);
+	  lcd_put_cur(0x1,0x0);
+	  if(a==0){
+   		  lcd_send_data(80);  // send string to the lcd
+	  }
+	  else{
+   		  lcd_send_data(81);  // send string to the lcd
+	  }
+	  osDelay(200);
+	  /*
+	  for(i=20;i<128;i++)
+ 		{
+  	      lcd_put_cur(0x1,0x0);
+  		  lcd_send_data(i);  // send string to the lcd
+  		  osDelay(200);
+  	    }
+  	    i=0;
+
+  	    */
   }
-  /* USER CODE END StartTask02 */
+  /* USER CODE END funcion_LCD */
 }
 
  /**
