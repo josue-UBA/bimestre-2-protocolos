@@ -4,7 +4,7 @@
 https://www.youtube.com/watch?v=LS7owD8C_tI
 
 ## STM32F401RE + LCD 16x2
-https://www.youtube.com/watch?v=ITTBWSQTi3c
+https://www.youtube.com/watch?v=rfRJGfK2t-A
 
 ## STM32F401RE + bluetooth HC-05  
 https://www.youtube.com/watch?v=1LcbZaTPZ90
