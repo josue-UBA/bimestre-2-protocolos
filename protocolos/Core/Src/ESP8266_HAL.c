@@ -5,7 +5,6 @@
  *      Author: Controllerstech
  */
 
-
 #include "UartRingbuffer_multi.h"
 #include "ESP8266_HAL.h"
 #include "stdio.h"
@@ -18,11 +17,10 @@ extern myQueue01Handle;
 #define wifi_uart &huart1
 #define pc_uart &huart2
 
-
 char buffer[20];
 
-
-char *Basic_inclusion = "<!DOCTYPE html> <html>\n<head><meta name=\"viewport\"\
+char *Basic_inclusion =
+		"<!DOCTYPE html> <html>\n<head><meta name=\"viewport\"\
 		content=\"width=device-width, initial-scale=1.0, user-scalable=no\">\n\
 		<title>LED CONTROL</title>\n<style>html { font-family: Helvetica; \
 		display: inline-block; margin: 0px auto; text-align: center;}\n\
@@ -36,24 +34,22 @@ char *Basic_inclusion = "<!DOCTYPE html> <html>\n<head><meta name=\"viewport\"\
 		.button-off:active {background-color: #2c3e50;}\np {font-size: 14px;color: #888;margin-bottom: 10px;}\n\
 		</style>\n</head>\n<body>\n<h1>ESP8266 LED CONTROL</h1>\n";
 
-char *LED_ON = "<p>LED Status: ON</p><a class=\"button button-off\" href=\"/ledoff\">OFF</a>";
-char *LED_OFF = "<p>LED1 Status: OFF</p><a class=\"button button-on\" href=\"/ledon\">ON</a>";
+char *LED_ON =
+		"<p>LED Status: ON</p><a class=\"button button-off\" href=\"/ledoff\">OFF</a>";
+char *LED_OFF =
+		"<p>LED1 Status: OFF</p><a class=\"button button-on\" href=\"/ledon\">ON</a>";
 char *Terminate = "</body></html>";
-
-
 
 /*****************************************************************************************************************************************/
 
-void ESP_Init (char *SSID, char *PASSWD)
-{
+void ESP_Init(char *SSID, char *PASSWD) {
 	char data[80];
 
 	Ringbuf_init();
 
 	Uart_sendstring("AT+RST\r\n", wifi_uart);
 	Uart_sendstring("RESETTING.", pc_uart);
-	for (int i=0; i<5; i++)
-	{
+	for (int i = 0; i < 5; i++) {
 		Uart_sendstring(".", pc_uart);
 		HAL_Delay(1000);
 	}
@@ -61,94 +57,94 @@ void ESP_Init (char *SSID, char *PASSWD)
 	/********* AT **********/
 	Uart_flush(wifi_uart);
 	Uart_sendstring("AT\r\n", wifi_uart);
-	while(!(Wait_for("OK\r\n", wifi_uart)));
+	while (!(Wait_for("OK\r\n", wifi_uart)))
+		;
 	Uart_sendstring("AT---->OK\n\r", pc_uart);
-
 
 	/********* AT+CWMODE=1 **********/
 	Uart_flush(wifi_uart);
 	Uart_sendstring("AT+CWMODE=1\r\n", wifi_uart);
-	while (!(Wait_for("OK\r\n", wifi_uart)));
+	while (!(Wait_for("OK\r\n", wifi_uart)))
+		;
 	Uart_sendstring("CW MODE---->1\n\r", pc_uart);
-
 
 	/********* AT+CWJAP="SSID","PASSWD" **********/
 	Uart_flush(wifi_uart);
 	Uart_sendstring("connecting... to the provided AP\n\r", pc_uart);
-	sprintf (data, "AT+CWJAP=\"%s\",\"%s\"\r\n", SSID, PASSWD);
+	sprintf(data, "AT+CWJAP=\"%s\",\"%s\"\r\n", SSID, PASSWD);
 	Uart_sendstring(data, wifi_uart);
-	while (!(Wait_for("OK\r\n", wifi_uart)));
-	sprintf (data, "Connected to,\"%s\"\n\r", SSID);
-	Uart_sendstring(data,pc_uart);
-
+	while (!(Wait_for("OK\r\n", wifi_uart)))
+		;
+	sprintf(data, "Connected to,\"%s\"\n\r", SSID);
+	Uart_sendstring(data, pc_uart);
 
 	/********* AT+CIFSR **********/
 	Uart_flush(wifi_uart);
 	Uart_sendstring("AT+CIFSR\r\n", wifi_uart);
-	while (!(Wait_for("CIFSR:STAIP,\"", wifi_uart)));
-	while (!(Copy_upto("\"",buffer, wifi_uart)));
-	while (!(Wait_for("OK\r\n", wifi_uart)));
-	int len = strlen (buffer);
-	buffer[len-1] = '\0';
-	sprintf (data, "IP ADDR: %s\n\r", buffer);
+	while (!(Wait_for("CIFSR:STAIP,\"", wifi_uart)))
+		;
+	while (!(Copy_upto("\"", buffer, wifi_uart)))
+		;
+	while (!(Wait_for("OK\r\n", wifi_uart)))
+		;
+	int len = strlen(buffer);
+	buffer[len - 1] = '\0';
+	sprintf(data, "IP ADDR: %s\n\r", buffer);
 	Uart_sendstring(data, pc_uart);
 
 	/********* AT+CIPMUX **********/
 	Uart_flush(wifi_uart);
 	Uart_sendstring("AT+CIPMUX=1\r\n", wifi_uart);
-	while (!(Wait_for("OK\r\n", wifi_uart)));
+	while (!(Wait_for("OK\r\n", wifi_uart)))
+		;
 	Uart_sendstring("CIPMUX---->OK\n\r", pc_uart);
 
 	/********* AT+CIPSERVER **********/
 	Uart_flush(wifi_uart);
 	Uart_sendstring("AT+CIPSERVER=1,80\r\n", wifi_uart);
-	while (!(Wait_for("OK\r\n", wifi_uart)));
+	while (!(Wait_for("OK\r\n", wifi_uart)))
+		;
 	Uart_sendstring("CIPSERVER---->OK\n\r", pc_uart);
 
 	Uart_sendstring("Now Connect to the IP ADRESS\n\r", pc_uart);
 
 }
 
-
-
-
-int Server_Send (char *str, int Link_ID)
-{
-	int len = strlen (str);
+int Server_Send(char *str, int Link_ID) {
+	int len = strlen(str);
 	char data[80];
-	sprintf (data, "AT+CIPSEND=%d,%d\r\n", Link_ID, len);
+	sprintf(data, "AT+CIPSEND=%d,%d\r\n", Link_ID, len);
 	Uart_sendstring(data, wifi_uart);
-	while (!(Wait_for(">", wifi_uart)));
-	Uart_sendstring (str, wifi_uart);
-	while (!(Wait_for("SEND OK", wifi_uart)));
-	sprintf (data, "AT+CIPCLOSE=5\r\n");
+	while (!(Wait_for(">", wifi_uart)))
+		;
+	Uart_sendstring(str, wifi_uart);
+	while (!(Wait_for("SEND OK", wifi_uart)))
+		;
+	sprintf(data, "AT+CIPCLOSE=5\r\n");
 	Uart_sendstring(data, wifi_uart);
-	while (!(Wait_for("OK\r\n", wifi_uart)));
+	while (!(Wait_for("OK\r\n", wifi_uart)))
+		;
 	return 1;
 }
 
-void Server_Handle (char *str, int Link_ID)
-{
-	char datatosend[1024] = {0};
-	if (!(strcmp (str, "/ledon")))
-	{
-		sprintf (datatosend, Basic_inclusion);
+void Server_Handle(char *str, int Link_ID) {
+	char datatosend[1024] = { 0 };
+	if (!(strcmp(str, "/ledon"))) {
+		sprintf(datatosend, Basic_inclusion);
 		strcat(datatosend, LED_ON);
 		strcat(datatosend, Terminate);
 		Server_Send(datatosend, Link_ID);
 	}
 
-	else if (!(strcmp (str, "/ledoff")))
-	{
-		sprintf (datatosend, Basic_inclusion);
+	else if (!(strcmp(str, "/ledoff"))) {
+		sprintf(datatosend, Basic_inclusion);
 		strcat(datatosend, LED_OFF);
 		strcat(datatosend, Terminate);
 		Server_Send(datatosend, Link_ID);
 	}
 
-	else
-	{
-		sprintf (datatosend, Basic_inclusion);
+	else {
+		sprintf(datatosend, Basic_inclusion);
 		strcat(datatosend, LED_OFF);
 		strcat(datatosend, Terminate);
 		Server_Send(datatosend, Link_ID);
@@ -156,51 +152,49 @@ void Server_Handle (char *str, int Link_ID)
 
 }
 
-void Server_Start (void)
-{
+void Server_Start(void) {
 	int a;
-	char buftocopyinto[64] = {0};
+	char buftocopyinto[64] = { 0 };
 	char Link_ID;
-	while (!(Get_after("+IPD,", 1, &Link_ID, wifi_uart)));
+	while (!(Get_after("+IPD,", 1, &Link_ID, wifi_uart)))
+		;
 	Link_ID -= 48;
-	while (!(Copy_upto(" HTTP/1.1", buftocopyinto, wifi_uart)));
-	if (Look_for("/ledon", buftocopyinto) == 1)
-	{
+	while (!(Copy_upto(" HTTP/1.1", buftocopyinto, wifi_uart)))
+		;
+	if (Look_for("/ledon", buftocopyinto) == 1) {
 		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 0);
 		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, 1);
 		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, 0);
 		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, 1);
-		Server_Handle("/ledon",Link_ID);
+		Server_Handle("/ledon", Link_ID);
 		a = 1;
-		osMessageQueuePut(myQueue01Handle,&a,0,0);
+		osMessageQueuePut(myQueue01Handle, &a, 0, 0);
 	}
 
-	else if (Look_for("/ledoff", buftocopyinto) == 1)
-	{
+	else if (Look_for("/ledoff", buftocopyinto) == 1) {
 		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 1);
 		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, 0);
 		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, 1);
 		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, 0);
 
-		Server_Handle("/ledoff",Link_ID);
+		Server_Handle("/ledoff", Link_ID);
 		a = 0;
-		osMessageQueuePut(myQueue01Handle,&a,0,0);
+		osMessageQueuePut(myQueue01Handle, &a, 0, 0);
 	}
 
-	else if (Look_for("/favicon.ico", buftocopyinto) == 1);
+	else if (Look_for("/favicon.ico", buftocopyinto) == 1)
+		;
 
-	else
-	{
+	else {
 		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 0);
 		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, 0);
 		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, 0);
 		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, 0);
 		Server_Handle("/ ", Link_ID);
-		a = 0;
-		osMessageQueuePut(myQueue01Handle,&a,0,0);
+		a = 2;
+		osMessageQueuePut(myQueue01Handle, &a, 0, 0);
 	}
-	Uart_sendstring(buftocopyinto,pc_uart);
-	Uart_sendstring("\n\n\r",pc_uart);
+	Uart_sendstring(buftocopyinto, pc_uart);
+	Uart_sendstring("\n\n\r", pc_uart);
 }
-
 
