@@ -334,7 +334,7 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_7|GPIO_PIN_8, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : B1_Pin */
   GPIO_InitStruct.Pin = B1_Pin;
@@ -342,8 +342,8 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(B1_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : PA5 */
-  GPIO_InitStruct.Pin = GPIO_PIN_5;
+  /*Configure GPIO pins : PA5 PA6 PA7 PA8 */
+  GPIO_InitStruct.Pin = GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_7|GPIO_PIN_8;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -399,22 +399,12 @@ void funcion_LCD(void *argument)
 	  osMessageQueueGet(myQueue01Handle,&a,0,0);
 	  lcd_put_cur(0x1,0x0);
 	  if(a==0){
-   		  lcd_send_data(80);  // send string to the lcd
+		  lcd_send_string("avanza...");  // send string to the lcd
 	  }
-	  else{
-   		  lcd_send_data(81);  // send string to the lcd
+	  else if(a==1){
+		  lcd_send_string("retrocede...");  // send string to the lcd
 	  }
 	  osDelay(200);
-	  /*
-	  for(i=20;i<128;i++)
- 		{
-  	      lcd_put_cur(0x1,0x0);
-  		  lcd_send_data(i);  // send string to the lcd
-  		  osDelay(200);
-  	    }
-  	    i=0;
-
-  	    */
   }
   /* USER CODE END funcion_LCD */
 }

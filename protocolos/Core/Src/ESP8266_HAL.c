@@ -166,7 +166,10 @@ void Server_Start (void)
 	while (!(Copy_upto(" HTTP/1.1", buftocopyinto, wifi_uart)));
 	if (Look_for("/ledon", buftocopyinto) == 1)
 	{
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 1);
+		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 0);
+		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, 1);
+		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, 0);
+		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, 1);
 		Server_Handle("/ledon",Link_ID);
 		a = 1;
 		osMessageQueuePut(myQueue01Handle,&a,0,0);
@@ -174,7 +177,11 @@ void Server_Start (void)
 
 	else if (Look_for("/ledoff", buftocopyinto) == 1)
 	{
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 0);
+		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 1);
+		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, 0);
+		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, 1);
+		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, 0);
+
 		Server_Handle("/ledoff",Link_ID);
 		a = 0;
 		osMessageQueuePut(myQueue01Handle,&a,0,0);
@@ -185,6 +192,9 @@ void Server_Start (void)
 	else
 	{
 		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 0);
+		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, 0);
+		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, 0);
+		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, 0);
 		Server_Handle("/ ", Link_ID);
 		a = 0;
 		osMessageQueuePut(myQueue01Handle,&a,0,0);
@@ -192,3 +202,5 @@ void Server_Start (void)
 	Uart_sendstring(buftocopyinto,pc_uart);
 	Uart_sendstring("\n\n\r",pc_uart);
 }
+
+
