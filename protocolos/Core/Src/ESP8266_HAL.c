@@ -30,14 +30,13 @@ char *Basic_inclusion =
 		.button-off:active {background-color: #2c3e50;}\np {font-size: 14px;color: #888;margin-bottom: 10px;}\n\
 		</style>\n</head>\n<body>\n<h1>Vehiculo controlado por WiFi</h1>\n";
 
-char *LED_ON =
-		"<p>El carro retrocede</p>";//LED Status: ON</p><a class=\"button button-off\" href=\"/ledoff\">retrocede</a>";
-char *LED_OFF =
-		"<p>El carro avanza</p>";//LED1 Status: OFF</p><a class=\"button button-on\" href=\"/ledon\">avanza</a>";
-char *Terminate = "</body></html>";
-
 /*****************************************************************************************************************************************/
 
+/*
+ *
+ * Inicializa ESP...
+ *
+ * */
 void ESP_Init(char *SSID, char *PASSWD) {
 	char data[80];
 
@@ -118,8 +117,7 @@ int Server_Send(char *str, int Link_ID) {
 		;
 	sprintf(data, "AT+CIPCLOSE=5\r\n");
 	Uart_sendstring(data, wifi_uart);
-	while (!(Wait_for("OK\r\n", wifi_uart)))
-		;
+	while (!(Wait_for("OK\r\n", wifi_uart)));
 	return 1;
 }
 
@@ -128,24 +126,27 @@ void Server_Handle(char *str, int Link_ID) {
 	if (!(strcmp(str, "/retrocede"))) {
 		sprintf(datatosend, Basic_inclusion);
 		strcat(datatosend, "<h2>El carro retrocede</h2>");
-		strcat(datatosend, Terminate);
+		strcat(datatosend, "</body></html>");
 		Server_Send(datatosend, Link_ID);
 	}
-
 	else if (!(strcmp(str, "/avanza"))) {
 		sprintf(datatosend, Basic_inclusion);
 		strcat(datatosend, "<h2>El carro avanza</h2>");
-		strcat(datatosend, Terminate);
+		strcat(datatosend, "</body></html>");
 		Server_Send(datatosend, Link_ID);
 	}
-
+	else if (!(strcmp(str, "/detente"))) {
+		sprintf(datatosend, Basic_inclusion);
+		strcat(datatosend, "<h2>El carro se detuvo</h2>");
+		strcat(datatosend, "</body></html>");
+		Server_Send(datatosend, Link_ID);
+	}
 	else {
 		sprintf(datatosend, Basic_inclusion);
-		strcat(datatosend, "<h2>El carro esta en nada</h2>");
-		strcat(datatosend, Terminate);
+		strcat(datatosend, "<h2>De una orden al carro.</h2>");
+		strcat(datatosend, "</body></html>");
 		Server_Send(datatosend, Link_ID);
 	}
-
 }
 
 void Server_Start(void) {
@@ -158,6 +159,7 @@ void Server_Start(void) {
 	/* ya esta en el buffer del UART */
 	while (!(Copy_upto(" HTTP/1.1", buftocopyinto, wifi_uart)));
 	Uart_sendstring(buftocopyinto, pc_uart);
+	Uart_sendstring("\n\n\r", pc_uart);
 
 	if (Look_for("/retrocede", buftocopyinto) == 1) {
 		vehiculo(0);
@@ -179,11 +181,7 @@ void Server_Start(void) {
 		a = 2;
 		osMessageQueuePut(myQueue01Handle, &a, 0, 0);
 	}
-	else if (Look_for("/favicon.ico", buftocopyinto) == 1);
-
-	//Uart_sendstring(buftocopyinto, pc_uart);
-	//Uart_sendstring("\n\r", pc_uart);
-	//Uart_sendstring(Link_ID, pc_uart);
-
-//	Uart_sendstring("\n\n\r", pc_uart);
+	else {
+		Server_Handle("", Link_ID);
+	}
 }
