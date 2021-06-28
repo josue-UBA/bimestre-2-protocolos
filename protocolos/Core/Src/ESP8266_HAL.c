@@ -1,13 +1,7 @@
-/*
- * ESP8266_HAL.c
- *
- *  Created on: Apr 14, 2020
- *      Author: Controllerstech
- */
-
 #include "UartRingbuffer_multi.h"
 #include "ESP8266_HAL.h"
 #include "stdio.h"
+#include "vehiculo.h"
 #include "string.h"
 
 extern UART_HandleTypeDef huart1;
@@ -16,6 +10,8 @@ extern myQueue01Handle;
 
 #define wifi_uart &huart1
 #define pc_uart &huart2
+
+void vehiculo(int accion);
 
 char buffer[20];
 
@@ -32,12 +28,12 @@ char *Basic_inclusion =
 		.button-on {background-color: #1abc9c;}\n.button-on:active \
 		{background-color: #16a085;}\n.button-off {background-color: #34495e;}\n\
 		.button-off:active {background-color: #2c3e50;}\np {font-size: 14px;color: #888;margin-bottom: 10px;}\n\
-		</style>\n</head>\n<body>\n<h1>ESP8266 LED CONTROL</h1>\n";
+		</style>\n</head>\n<body>\n<h1>Vehiculo controlado por WiFi</h1>\n";
 
 char *LED_ON =
-		"<p>LED Status: ON</p><a class=\"button button-off\" href=\"/ledoff\">OFF</a>";
+		"<p>El carro retrocede</p>";//LED Status: ON</p><a class=\"button button-off\" href=\"/ledoff\">retrocede</a>";
 char *LED_OFF =
-		"<p>LED1 Status: OFF</p><a class=\"button button-on\" href=\"/ledon\">ON</a>";
+		"<p>El carro avanza</p>";//LED1 Status: OFF</p><a class=\"button button-on\" href=\"/ledon\">avanza</a>";
 char *Terminate = "</body></html>";
 
 /*****************************************************************************************************************************************/
@@ -129,23 +125,23 @@ int Server_Send(char *str, int Link_ID) {
 
 void Server_Handle(char *str, int Link_ID) {
 	char datatosend[1024] = { 0 };
-	if (!(strcmp(str, "/ledon"))) {
+	if (!(strcmp(str, "/retrocede"))) {
 		sprintf(datatosend, Basic_inclusion);
-		strcat(datatosend, LED_ON);
+		strcat(datatosend, "<h2>El carro retrocede</h2>");
 		strcat(datatosend, Terminate);
 		Server_Send(datatosend, Link_ID);
 	}
 
-	else if (!(strcmp(str, "/ledoff"))) {
+	else if (!(strcmp(str, "/avanza"))) {
 		sprintf(datatosend, Basic_inclusion);
-		strcat(datatosend, LED_OFF);
+		strcat(datatosend, "<h2>El carro avanza</h2>");
 		strcat(datatosend, Terminate);
 		Server_Send(datatosend, Link_ID);
 	}
 
 	else {
 		sprintf(datatosend, Basic_inclusion);
-		strcat(datatosend, LED_OFF);
+		strcat(datatosend, "<h2>El carro esta en nada</h2>");
 		strcat(datatosend, Terminate);
 		Server_Send(datatosend, Link_ID);
 	}
@@ -156,45 +152,38 @@ void Server_Start(void) {
 	int a;
 	char buftocopyinto[64] = { 0 };
 	char Link_ID;
-	while (!(Get_after("+IPD,", 1, &Link_ID, wifi_uart)))
-		;
+	/*recibe la informacion y lo almacena en el buffer del uart */
+	while (!(Get_after("+IPD,", 1, &Link_ID, wifi_uart)));
 	Link_ID -= 48;
-	while (!(Copy_upto(" HTTP/1.1", buftocopyinto, wifi_uart)))
-		;
-	if (Look_for("/ledon", buftocopyinto) == 1) {
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 0);
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, 1);
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, 0);
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, 1);
-		Server_Handle("/ledon", Link_ID);
+	/* ya esta en el buffer del UART */
+	while (!(Copy_upto(" HTTP/1.1", buftocopyinto, wifi_uart)));
+	Uart_sendstring(buftocopyinto, pc_uart);
+
+	if (Look_for("/retrocede", buftocopyinto) == 1) {
+		vehiculo(0);
+		Server_Handle("/retrocede", Link_ID);
 		a = 1;
 		osMessageQueuePut(myQueue01Handle, &a, 0, 0);
 	}
 
-	else if (Look_for("/ledoff", buftocopyinto) == 1) {
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 1);
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, 0);
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, 1);
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, 0);
-
-		Server_Handle("/ledoff", Link_ID);
+	else if (Look_for("/avanza", buftocopyinto) == 1) {
+		vehiculo(1);
+		Server_Handle("/avanza", Link_ID);
 		a = 0;
 		osMessageQueuePut(myQueue01Handle, &a, 0, 0);
 	}
 
-	else if (Look_for("/favicon.ico", buftocopyinto) == 1)
-		;
-
-	else {
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 0);
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, 0);
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, 0);
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, 0);
-		Server_Handle("/ ", Link_ID);
+	else if (Look_for("/detente", buftocopyinto) == 1){
+		vehiculo(2);
+		Server_Handle("/detente", Link_ID);
 		a = 2;
 		osMessageQueuePut(myQueue01Handle, &a, 0, 0);
 	}
-	Uart_sendstring(buftocopyinto, pc_uart);
-	Uart_sendstring("\n\n\r", pc_uart);
-}
+	else if (Look_for("/favicon.ico", buftocopyinto) == 1);
 
+	//Uart_sendstring(buftocopyinto, pc_uart);
+	//Uart_sendstring("\n\r", pc_uart);
+	//Uart_sendstring(Link_ID, pc_uart);
+
+//	Uart_sendstring("\n\n\r", pc_uart);
+}
