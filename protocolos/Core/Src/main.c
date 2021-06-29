@@ -1,21 +1,10 @@
-/* USER CODE BEGIN Header */
-/**
- ******************************************************************************
- * @file           : main.c
- * @brief          : Main program body
- ******************************************************************************
- * @attention
+/*
  *
- * <h2><center>&copy; Copyright (c) 2021 STMicroelectronics.
- * All rights reserved.</center></h2>
+ * Protocolo de comunicacion
+ * Ing. Josue Huaman
  *
- * This software component is licensed by ST under BSD 3-Clause license,
- * the "License"; You may not use this file except in compliance with the
- * License. You may obtain a copy of the License at:
- *                        opensource.org/licenses/BSD-3-Clause
- *
- ******************************************************************************
  */
+
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
@@ -50,11 +39,11 @@ UART_HandleTypeDef huart2;
 /* Definitions for tarea_wifi */
 osThreadId_t tarea_wifiHandle;
 const osThreadAttr_t tarea_wifi_attributes = { .name = "tarea_wifi",
-		.stack_size = 960 * 4, .priority = (osPriority_t) osPriorityNormal, };
+		.stack_size = 980 * 4, .priority = (osPriority_t) osPriorityNormal, };
 /* Definitions for tarea_LCD */
 osThreadId_t tarea_LCDHandle;
 const osThreadAttr_t tarea_LCD_attributes = { .name = "tarea_LCD", .stack_size =
-		960 * 4, .priority = (osPriority_t) osPriorityNormal, };
+		980 * 4, .priority = (osPriority_t) osPriorityNormal, };
 /* Definitions for myQueue01 */
 osMessageQueueId_t myQueue01Handle;
 const osMessageQueueAttr_t myQueue01_attributes = { .name = "myQueue01" };
@@ -130,7 +119,8 @@ int main(void) {
 
 	/* Create the queue(s) */
 	/* creation of myQueue01 */
-	myQueue01Handle = osMessageQueueNew(16, sizeof(int), &myQueue01_attributes);
+	myQueue01Handle = osMessageQueueNew(16, sizeof(uint16_t),
+			&myQueue01_attributes);
 
 	/* USER CODE BEGIN RTOS_QUEUES */
 	/* add queues, ... */
@@ -383,6 +373,8 @@ void funcion_LCD(void *argument) {
 			lcd_send_string("retrocede...");  // send string to the lcd
 		} else if (a == 2) {
 			lcd_send_string("detenido.");  // send string to the lcd
+		} else if (a == 3) {
+			lcd_send_string("da una orden.");  // send string to the lcd
 		}
 
 		osDelay(200);

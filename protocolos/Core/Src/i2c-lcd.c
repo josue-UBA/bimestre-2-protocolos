@@ -1,9 +1,14 @@
-/** Put this in the src folder **/
+/*
+ *
+ * Protocolo de comunicacion
+ * Ing. Josue Huaman
+ *
+ */
 
 #include "i2c-lcd.h"
-extern I2C_HandleTypeDef hi2c1;  // change your handler here accordingly
+extern I2C_HandleTypeDef hi2c1;
 
-#define SLAVE_ADDRESS_LCD 0x4E // change this according to ur setup
+#define SLAVE_ADDRESS_LCD 0x4E // Esto va de acuerdo al modelo PFC que estamos usando
 
 void lcd_send_cmd(char cmd) {
 	char data_u, data_l;
@@ -17,6 +22,11 @@ void lcd_send_cmd(char cmd) {
 	HAL_I2C_Master_Transmit(&hi2c1, SLAVE_ADDRESS_LCD, (uint8_t*) data_t, 4,
 			100);
 }
+
+/*
+ * Enviar caracter por I2C
+ *
+ * */
 
 void lcd_send_data(char data) {
 	char data_u, data_l;
@@ -50,7 +60,10 @@ void lcd_put_cur(int row, int col) {
 
 	lcd_send_cmd(col);
 }
-
+/*
+ * Inicializa LCD
+ *
+ * */
 void lcd_init(void) {
 	// 4 bit initialisation
 	HAL_Delay(50);  // wait for >40ms
@@ -75,6 +88,11 @@ void lcd_init(void) {
 	HAL_Delay(1);
 	lcd_send_cmd(0x0C); //Display on/off control --> D = 1, C and B = 0. (Cursor and blink, last two bits)
 }
+
+/*
+ * Funcion para enviar varios caracteres
+ *
+ * */
 
 void lcd_send_string(char *str) {
 	while (*str)

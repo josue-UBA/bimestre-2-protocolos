@@ -1,3 +1,11 @@
+/*
+ *
+ * Protocolo de comunicacion
+ * Ing. Josue Huaman
+ *
+ */
+
+
 #include "UartRingbuffer_multi.h"
 #include "ESP8266_HAL.h"
 #include "stdio.h"
@@ -158,8 +166,8 @@ void Server_Start(void) {
 	Link_ID -= 48;
 	/* ya esta en el buffer del UART */
 	while (!(Copy_upto(" HTTP/1.1", buftocopyinto, wifi_uart)));
-	Uart_sendstring(buftocopyinto, pc_uart);
-	Uart_sendstring("\n\n\r", pc_uart);
+	//Uart_sendstring(buftocopyinto, pc_uart);
+	//Uart_sendstring("\n\n\r", pc_uart);
 
 	if (Look_for("/retrocede", buftocopyinto) == 1) {
 		vehiculo(0);
@@ -180,8 +188,5 @@ void Server_Start(void) {
 		Server_Handle("/detente", Link_ID);
 		a = 2;
 		osMessageQueuePut(myQueue01Handle, &a, 0, 0);
-	}
-	else {
-		Server_Handle("", Link_ID);
 	}
 }

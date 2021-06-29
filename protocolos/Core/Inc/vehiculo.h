@@ -1,8 +1,8 @@
 /*
- * vehiculo.h
  *
- *  Created on: Jun 28, 2021
- *      Author: Elias
+ * Protocolo de comunicacion
+ * Ing. Josue Huaman
+ *
  */
 
 #ifndef INC_VEHICULO_H_

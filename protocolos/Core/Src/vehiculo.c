@@ -1,8 +1,8 @@
 /*
- * vehiculo.c
  *
- *  Created on: Jun 28, 2021
- *      Author: Elias
+ * Protocolo de comunicacion
+ * Ing. Josue Huaman
+ *
  */
 
 #include "vehiculo.h"
@@ -23,13 +23,6 @@ void vehiculo(int accion){
 		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_SET);
 	}
 	if(accion==2){
-		/* entonces detente */
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_RESET);
-	}
-	else{
 		/* entonces detente */
 		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
 		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_RESET);
